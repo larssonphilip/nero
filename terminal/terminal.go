@@ -38,19 +38,23 @@ func ReadInput() (byte, error) {
 }
 
 func ReadKey() (string, error) {
-	b, err := ReadInput()
+	b := make([]byte, 1)
+	_, err := os.Stdin.Read(b)
 	if err != nil {
 		return "", err
 	}
 
-	// Escape sequence
-	if b == 27 {
+	// Check if the input is an escape sequence
+	if b[0] == 27 {
 		sequence := make([]byte, 2)
-		bytesRead, err := os.Stdin.Read(sequence)
-		if bytesRead == 0 || err != nil {
-			return "ESC", err
+		os.Stdin.Read(sequence)
+
+		// Double press ESC to exit
+		if len(sequence) > 1 && sequence[1] == 0 {
+			return "ESC", nil
 		}
 
+		// Interpret the escape sequence as an arrow key
 		switch string(sequence) {
 		case "[A":
 			return "UP", nil
@@ -65,6 +69,7 @@ func ReadKey() (string, error) {
 		}
 	}
 
+	// Return the single character as a string
 	return string(b), nil
 }
 
@@ -73,7 +78,7 @@ func ClearScreen() {
 }
 
 func MoveCursor(row, col int) {
-	fmt.Printf("\x1b[%d;%dH", row, col)
+	fmt.Printf("\x1b[%d;%dH", col+1, row+1)
 }
 
 func HideCursor() {

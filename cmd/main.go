@@ -16,6 +16,13 @@ func main() {
 		os.Exit(1)
 	}
 
+	if err := terminal.EnableRawMode(); err != nil {
+		fmt.Printf("Error enabling raw mode: %v\n", err)
+		os.Exit(1)
+	}
+
+	defer terminal.RestoreTerminal()
+
 	filePath := os.Args[1]
 
 	fileContent, err := file.LoadFile(filePath)
@@ -25,16 +32,12 @@ func main() {
 	}
 
 	e := editor.InitializeEditor(fileContent)
-	if err := terminal.EnableRawMode(); err != nil {
-		fmt.Printf("Error enabling raw mode: %v\n", err)
-		os.Exit(1)
+
+	for {
+		render.RenderScreen(e)
+		if err := e.ProcessKeyPress(); err != nil {
+			fmt.Printf("Error processing key press: %v\n", err)
+			break
+		}
 	}
-
-	defer terminal.RestoreTerminal()
-
-	render.RenderScreen(e)
-
-	fmt.Println("\nPress any key to exit")
-	var b [1]byte
-	os.Stdin.Read(b[:])
 }

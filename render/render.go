@@ -20,10 +20,16 @@ func RenderScreen(e *editor.Editor) {
 
 	for _, line := range content {
 		for len(line) > width {
-			fmt.Print(line[:width] + "\r\n")
+			printLine(line[:width])
 			line = line[width:]
 		}
 
-		fmt.Print(line + "\r\n")
+		printLine(line)
 	}
+
+	terminal.MoveCursor(e.CursorX, e.CursorY)
+}
+
+func printLine(line string) {
+	fmt.Print(line + "\r\n")
 }
