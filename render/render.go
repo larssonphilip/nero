@@ -2,6 +2,7 @@ package render
 
 import (
 	"fmt"
+	"math"
 
 	"nero.app/nero/editor"
 	"nero.app/nero/terminal"
@@ -18,18 +19,30 @@ func RenderScreen(e *editor.Editor) {
 		fmt.Printf("Error while getting window size: %v\n", err)
 	}
 
-	for _, line := range content {
+	lineNumberWidth := calculateLineNumberWidth(content)
+
+	for lineNumber, line := range content {
 		for len(line) > width {
-			printLine(line[:width])
+			printLine(lineNumber, lineNumberWidth, line[:width])
 			line = line[width:]
 		}
 
-		printLine(line)
+		printLine(lineNumber, lineNumberWidth, line)
 	}
 
 	terminal.MoveCursor(e.CursorX, e.CursorY)
 }
 
-func printLine(line string) {
+func calculateLineNumberWidth(content []string) int {
+	return int(math.Log10(float64(len(content))) + 1)
+}
+
+func printLine(lineNumber, lineNumberWidth int, line string) {
+	numberOfDigitsInLineNumber := int(math.Log10(float64(lineNumber))) + 1
+	for i := 0; i < lineNumberWidth; i++ {
+		if numberOfDigitsInLineNumber < lineNumberWidth {
+		}
+		fmt.Print(" ")
+	}
 	fmt.Print(line + "\r\n")
 }

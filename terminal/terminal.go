@@ -51,19 +51,19 @@ func ReadKey() (string, error) {
 
 		// Double press ESC to exit
 		if len(sequence) > 1 && sequence[1] == 0 {
-			return "ESC", nil
+			return KeyEsc, nil
 		}
 
 		// Interpret the escape sequence as an arrow key
 		switch string(sequence) {
 		case "[A":
-			return "UP", nil
+			return KeyUp, nil
 		case "[B":
-			return "DOWN", nil
+			return KeyDown, nil
 		case "[C":
-			return "RIGHT", nil
+			return KeyRight, nil
 		case "[D":
-			return "LEFT", nil
+			return KeyLeft, nil
 		default:
 			return "UNKNOWN", nil
 		}
