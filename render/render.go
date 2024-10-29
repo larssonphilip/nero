@@ -30,7 +30,7 @@ func RenderScreen(e *editor.Editor) {
 		printLine(lineNumber, lineNumberWidth, line)
 	}
 
-	terminal.MoveCursor(e.CursorX, e.CursorY)
+	terminal.MoveCursor(e.CursorX+lineNumberWidth+2, e.CursorY)
 }
 
 func calculateLineNumberWidth(content []string) int {
@@ -38,11 +38,6 @@ func calculateLineNumberWidth(content []string) int {
 }
 
 func printLine(lineNumber, lineNumberWidth int, line string) {
-	numberOfDigitsInLineNumber := int(math.Log10(float64(lineNumber))) + 1
-	for i := 0; i < lineNumberWidth; i++ {
-		if numberOfDigitsInLineNumber < lineNumberWidth {
-		}
-		fmt.Print(" ")
-	}
+	fmt.Printf("%*d  ", lineNumberWidth, lineNumber+1)
 	fmt.Print(line + "\r\n")
 }

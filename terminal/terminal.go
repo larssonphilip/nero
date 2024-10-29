@@ -67,10 +67,20 @@ func ReadKey() (string, error) {
 		default:
 			return "UNKNOWN", nil
 		}
+	} else if b[0] == 127 {
+		return KeyBackspace, nil
+	} else if b[0] == 13 {
+		return KeyEnter, nil
+	} else if b[0] == 9 {
+		return KeyTab, nil
 	}
 
-	// Return the single character as a string
-	return string(b), nil
+	// Return the single character as a string if non-control key
+	if b[0] > 31 && b[0] < 127 {
+		return string(b), nil
+	}
+
+	return "UNKNOWN", nil
 }
 
 func ClearScreen() {

@@ -30,7 +30,7 @@ func (editor *Editor) ProcessKeyPress() error {
 		return err
 	}
 
-	// Handle key-based cursor movement
+	// Handle key presses
 	switch key {
 	case terminal.KeyUp:
 		if editor.CursorY > 0 {
@@ -48,8 +48,28 @@ func (editor *Editor) ProcessKeyPress() error {
 		if editor.CursorX > 0 {
 			editor.CursorX--
 		}
+	case terminal.KeyBackspace:
+		line := editor.FileContent[editor.CursorY]
+		if editor.CursorX > 0 {
+			editor.FileContent[editor.CursorY] = line[:editor.CursorX-1] + line[editor.CursorX:]
+			editor.CursorX--
+		}
+	case terminal.KeyEnter:
+		// This might not work as expected
+		line := editor.FileContent[editor.CursorY]
+		editor.FileContent = append(editor.FileContent[:editor.CursorY+1], editor.FileContent[editor.CursorY:]...)
+		editor.FileContent[editor.CursorY] = line[:editor.CursorX]
+		editor.FileContent[editor.CursorY+1] = line[editor.CursorX:]
+	case terminal.KeyTab:
+		line := editor.FileContent[editor.CursorY]
+		editor.FileContent[editor.CursorY] = line[:editor.CursorX] + "    " + line[editor.CursorX:]
+		editor.CursorX += 4
 	case terminal.KeyEsc:
 		os.Exit(0)
+	default:
+		line := editor.FileContent[editor.CursorY]
+		editor.FileContent[editor.CursorY] = line[:editor.CursorX] + string(key) + line[editor.CursorX:]
+		editor.CursorX++
 	}
 
 	return nil
