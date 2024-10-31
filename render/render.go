@@ -39,8 +39,9 @@ func calculateLineNumberWidth(content []string) int {
 }
 
 func printLine(lineNumber, lineNumberWidth int, line string) {
-	terminal.SetTextColor(themes.Red)
+	terminal.SetTextColor(themes.White)
 	fmt.Printf("%*d  ", lineNumberWidth, lineNumber+1)
-	terminal.ResetTextColor()
+	terminal.SetTextColor(themes.Default)
 	fmt.Print(line + "\r\n")
+	terminal.ResetTextColor()
 }
