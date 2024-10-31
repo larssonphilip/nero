@@ -15,9 +15,7 @@ func RenderScreen(e *editor.Editor) {
 
 	content := e.GetEditorContent()
 
-	terminalWidth, terminalHeight, err := terminal.GetWindowSize()
-	contentHeight := terminalHeight - 1
-
+	terminalWidth, _, err := terminal.GetWindowSize()
 	if err != nil {
 		fmt.Printf("Error while getting window size: %v\n", err)
 	}

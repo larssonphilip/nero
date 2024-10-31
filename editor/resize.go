@@ -14,7 +14,7 @@ func HandleResize(editor *Editor) {
 	signal.Notify(c, syscall.SIGWINCH)
 	go func() {
 		for range c {
-			width, height, err := terminal.GetWindowSize()
+			_, _, err := terminal.GetWindowSize()
 			if err != nil {
 				fmt.Printf("Error while getting window size: %v\n", err)
 			}

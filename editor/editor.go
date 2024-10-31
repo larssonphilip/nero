@@ -7,21 +7,34 @@ import (
 )
 
 type Editor struct {
-	FilePath    string
-	FileContent []string
-	CursorX     int
-	CursorY     int
-	Modified    bool
+	FilePath      string
+	FileContent   []string
+	CursorX       int
+	CursorY       int
+	Modified      bool
+	RowOffset     int
+	ColOffset     int
+	ContentWidth  int
+	ContentHeight int
 }
 
 func InitializeEditor(filePath string, fileContent []string) *Editor {
 	terminal.EnterFullScreen()
+	terminalWidth, terminalHeight, err := terminal.GetWindowSize()
+	if err != nil {
+		terminal.ExitFullScreen()
+		os.Exit(0)
+	}
 	return &Editor{
-		FilePath:    filePath,
-		FileContent: fileContent,
-		CursorX:     0,
-		CursorY:     0,
-		Modified:    false,
+		FilePath:      filePath,
+		FileContent:   fileContent,
+		CursorX:       0,
+		CursorY:       0,
+		Modified:      false,
+		RowOffset:     0,
+		ColOffset:     0,
+		ContentWidth:  terminalWidth,
+		ContentHeight: terminalHeight - 1,
 	}
 }
 
@@ -79,6 +92,16 @@ func (editor *Editor) ProcessKeyPress() error {
 	}
 
 	return nil
+}
+
+func (editor *Editor) Scroll() {
+	if editor.CursorY < editor.RowOffset {
+		editor.RowOffset = editor.CursorY
+	}
+
+	if editor.CursorY >= editor.RowOffset+editor.ContentHeight {
+		editor.RowOffset = editor.CursorY - editor.ContentHeight + 1
+	}
 }
 
 func saveFileAs(filePath string, content []string) error {
