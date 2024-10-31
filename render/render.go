@@ -6,6 +6,7 @@ import (
 
 	"nero.app/nero/editor"
 	"nero.app/nero/terminal"
+	"nero.app/nero/themes"
 )
 
 func RenderScreen(e *editor.Editor) {
@@ -38,6 +39,8 @@ func calculateLineNumberWidth(content []string) int {
 }
 
 func printLine(lineNumber, lineNumberWidth int, line string) {
+	terminal.SetTextColor(themes.Red)
 	fmt.Printf("%*d  ", lineNumberWidth, lineNumber+1)
+	terminal.ResetTextColor()
 	fmt.Print(line + "\r\n")
 }

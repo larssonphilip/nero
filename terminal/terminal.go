@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"golang.org/x/term"
+	"nero.app/nero/themes"
 )
 
 var originalState *term.State
@@ -44,8 +45,8 @@ func ReadKey() (string, error) {
 		return "", err
 	}
 
-	// Check if the input is an escape sequence
-	if b[0] == 27 {
+	switch b[0] {
+	case 27:
 		sequence := make([]byte, 2)
 		os.Stdin.Read(sequence)
 
@@ -67,20 +68,18 @@ func ReadKey() (string, error) {
 		default:
 			return "UNKNOWN", nil
 		}
-	} else if b[0] == 127 {
+	case 127:
 		return KeyBackspace, nil
-	} else if b[0] == 13 {
+	case 13:
 		return KeyEnter, nil
-	} else if b[0] == 9 {
+	case 9:
 		return KeyTab, nil
+	default:
+		if b[0] > 31 && b[0] < 127 {
+			return string(b), nil
+		}
+		return "UNKNOWN", nil
 	}
-
-	// Return the single character as a string if non-control key
-	if b[0] > 31 && b[0] < 127 {
-		return string(b), nil
-	}
-
-	return "UNKNOWN", nil
 }
 
 func ClearScreen() {
@@ -120,7 +119,13 @@ func GetWindowSize() (int, int, error) {
 	return width, height, err
 }
 
-func setTextColor() {}
+func SetTextColor(color int) {
+	fmt.Printf("\x1b[%dm", color)
+}
+
+func ResetTextColor() {
+	fmt.Printf("\x1b[%dm", themes.Default)
+}
 
 func setBackgroundColor() {}
 
