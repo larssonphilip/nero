@@ -15,7 +15,9 @@ func RenderScreen(e *editor.Editor) {
 
 	content := e.GetEditorContent()
 
-	width, _, err := terminal.GetWindowSize()
+	terminalWidth, terminalHeight, err := terminal.GetWindowSize()
+	contentHeight := terminalHeight - 1
+
 	if err != nil {
 		fmt.Printf("Error while getting window size: %v\n", err)
 	}
@@ -23,9 +25,9 @@ func RenderScreen(e *editor.Editor) {
 	lineNumberWidth := calculateLineNumberWidth(content)
 
 	for lineNumber, line := range content {
-		for len(line) > width {
-			printLine(lineNumber, lineNumberWidth, line[:width])
-			line = line[width:]
+		for len(line) > terminalWidth {
+			printLine(lineNumber, lineNumberWidth, line[:terminalWidth])
+			line = line[terminalWidth:]
 		}
 
 		printLine(lineNumber, lineNumberWidth, line)

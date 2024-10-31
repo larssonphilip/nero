@@ -31,7 +31,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	e := editor.InitializeEditor(fileContent)
+	e := editor.InitializeEditor(filePath, fileContent)
 
 	for {
 		render.RenderScreen(e)

@@ -7,17 +7,21 @@ import (
 )
 
 type Editor struct {
+	FilePath    string
 	FileContent []string
 	CursorX     int
 	CursorY     int
+	Modified    bool
 }
 
-func InitializeEditor(fileContent []string) *Editor {
+func InitializeEditor(filePath string, fileContent []string) *Editor {
 	terminal.EnterFullScreen()
 	return &Editor{
+		FilePath:    filePath,
 		FileContent: fileContent,
 		CursorX:     0,
 		CursorY:     0,
+		Modified:    false,
 	}
 }
 
@@ -75,4 +79,23 @@ func (editor *Editor) ProcessKeyPress() error {
 	}
 
 	return nil
+}
+
+func saveFileAs(filePath string, content []string) error {
+	file, err := os.Create(filePath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	for _, line := range content {
+		_, err := file.WriteString(line + "\n")
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (editor *Editor) saveCurrentFile() error {
+	return saveFileAs(editor.FilePath, editor.FileContent)
 }
