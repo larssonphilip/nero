@@ -13,6 +13,7 @@ type Editor struct {
 }
 
 func InitializeEditor(fileContent []string) *Editor {
+	terminal.EnterFullScreen()
 	return &Editor{
 		FileContent: fileContent,
 		CursorX:     0,
@@ -65,6 +66,7 @@ func (editor *Editor) ProcessKeyPress() error {
 		editor.FileContent[editor.CursorY] = line[:editor.CursorX] + "    " + line[editor.CursorX:]
 		editor.CursorX += 4
 	case terminal.KeyEsc:
+		terminal.ExitFullScreen()
 		os.Exit(0)
 	default:
 		line := editor.FileContent[editor.CursorY]

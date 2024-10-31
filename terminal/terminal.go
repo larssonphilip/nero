@@ -127,6 +127,14 @@ func ResetTextColor() {
 	fmt.Printf("\x1b[%dm", themes.Default)
 }
 
+func EnterFullScreen() {
+	fmt.Printf("\x1b[?1049h")
+}
+
+func ExitFullScreen() {
+	fmt.Printf("\x1b[?1049l")
+}
+
 func setBackgroundColor() {}
 
 func resetTextAttributes() {}
