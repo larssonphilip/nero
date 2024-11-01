@@ -8,6 +8,7 @@ const (
 	Yellow  = 33
 	Blue    = 34
 	White   = 37
+	Gray    = 90
 	Default = 39
 	Reset   = 0
 )

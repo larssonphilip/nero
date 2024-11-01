@@ -71,6 +71,7 @@ func (editor *Editor) ProcessKeyPress() error {
 		if editor.CursorX > 0 {
 			editor.FileContent[editor.CursorY] = line[:editor.CursorX-1] + line[editor.CursorX:]
 			editor.CursorX--
+			editor.Modified = true
 		}
 	case terminal.KeyEnter:
 		// This might not work as expected
@@ -78,10 +79,12 @@ func (editor *Editor) ProcessKeyPress() error {
 		editor.FileContent = append(editor.FileContent[:editor.CursorY+1], editor.FileContent[editor.CursorY:]...)
 		editor.FileContent[editor.CursorY] = line[:editor.CursorX]
 		editor.FileContent[editor.CursorY+1] = line[editor.CursorX:]
+		editor.Modified = true
 	case terminal.KeyTab:
 		line := editor.FileContent[editor.CursorY]
 		editor.FileContent[editor.CursorY] = line[:editor.CursorX] + "    " + line[editor.CursorX:]
 		editor.CursorX += 4
+		editor.Modified = true
 	case terminal.KeyEsc:
 		terminal.ExitFullScreen()
 		os.Exit(0)
@@ -89,6 +92,7 @@ func (editor *Editor) ProcessKeyPress() error {
 		line := editor.FileContent[editor.CursorY]
 		editor.FileContent[editor.CursorY] = line[:editor.CursorX] + string(key) + line[editor.CursorX:]
 		editor.CursorX++
+		editor.Modified = true
 	}
 
 	return nil

@@ -11,37 +11,97 @@ import (
 
 func RenderScreen(e *editor.Editor) {
 	terminal.ClearScreen()
-	terminal.MoveCursor(0, 0)
+	terminal.HideCursor()
+	defer terminal.ShowCursor()
 
-	content := e.GetEditorContent()
-
-	terminalWidth, _, err := terminal.GetWindowSize()
+	terminalWidth, terminalHeight, err := terminal.GetWindowSize()
 	if err != nil {
 		fmt.Printf("Error while getting window size: %v\n", err)
 	}
 
+	// Calculate the content height with one line reserved for status bar
+	e.ContentHeight = terminalHeight - 1
+	e.ContentWidth = terminalWidth
+
+	// Adjust the scrolling based on cursor position
+	e.Scroll()
+
+	content := e.GetEditorContent()
 	lineNumberWidth := calculateLineNumberWidth(content)
 
-	for lineNumber, line := range content {
-		for len(line) > terminalWidth {
-			printLine(lineNumber, lineNumberWidth, line[:terminalWidth])
-			line = line[terminalWidth:]
+	for i := 0; i < e.ContentHeight; i++ {
+		fileLineIndex := i + e.RowOffset
+		terminal.MoveCursor(i, 0)
+		if fileLineIndex < len(content) {
+			line := content[fileLineIndex]
+			printLine(e.RowOffset, fileLineIndex, lineNumberWidth, line)
+		} else {
+			fmt.Println("~")
 		}
-
-		printLine(lineNumber, lineNumberWidth, line)
 	}
 
-	terminal.MoveCursor(e.CursorX+lineNumberWidth+2, e.CursorY)
+	renderStatusBar(e, terminalWidth)
+
+	cursorX := e.CursorX - lineNumberWidth + 2 - e.ColOffset
+	cursorY := e.CursorY - e.RowOffset
+
+	if cursorY >= 0 && cursorY < e.ContentHeight {
+		terminal.MoveCursor(cursorY, cursorX)
+	}
 }
 
 func calculateLineNumberWidth(content []string) int {
-	return int(math.Log10(float64(len(content))) + 1)
+	lineCount := len(content)
+	if lineCount == 0 {
+		return 1
+	}
+	return int(math.Log10(float64(lineCount) + 1))
 }
 
-func printLine(lineNumber, lineNumberWidth int, line string) {
+func printLine(rowOffset int, lineNumber, lineNumberWidth int, line string) {
+	// Move cursor according to the offset
+	terminal.MoveCursor(lineNumber-rowOffset, 0)
+
 	terminal.SetTextColor(themes.White)
 	fmt.Printf("%*d  ", lineNumberWidth, lineNumber+1)
-	terminal.SetTextColor(themes.Default)
-	fmt.Print(line + "\r\n")
 	terminal.ResetTextColor()
+
+	fmt.Println(line)
+}
+
+func renderStatusBar(e *editor.Editor, terminalWidth int) {
+	fmt.Print("\x1b[7m")
+
+	fileName := e.FilePath
+	if fileName == "" {
+		fileName = "Untitled"
+	}
+
+	modifiedFlag := ""
+	if e.Modified {
+		modifiedFlag = "[Modified]"
+	}
+
+	lineNumber := e.CursorY + 1
+	columnNumber := e.CursorX + 1
+	totalLines := len(e.GetEditorContent())
+
+	leftStatus := fmt.Sprintf("%s %s - %d lines %s", fileName, modifiedFlag, totalLines, themes.Gray)
+	rightStatus := fmt.Sprintf("%d:%d", lineNumber, columnNumber)
+
+	padding := terminalWidth - len(leftStatus) - len(rightStatus)
+	if padding < 0 {
+		padding = 0
+	}
+
+	statusBar := fmt.Sprintf("%s%*s%s", leftStatus, padding, " ", rightStatus)
+
+	if len(statusBar) > terminalWidth {
+		statusBar = statusBar[:terminalWidth]
+	}
+
+	terminal.MoveCursor(e.ContentHeight, 0)
+
+	fmt.Print(statusBar)
+	fmt.Print("\x1b[0m")
 }
