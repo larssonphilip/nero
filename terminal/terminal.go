@@ -87,7 +87,7 @@ func ClearScreen() {
 }
 
 func MoveCursor(row, col int) {
-	fmt.Printf("\x1b[%d;%dH", col+1, row+1)
+	fmt.Printf("\x1b[%d;%dH", row+1, col+1)
 }
 
 func HideCursor() {
