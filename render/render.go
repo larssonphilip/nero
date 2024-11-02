@@ -51,22 +51,20 @@ func RenderScreen(e *editor.Editor) {
 }
 
 func calculateLineNumberWidth(content []string) int {
-	lineCount := len(content)
-	if lineCount == 0 {
-		return 1
-	}
-	return int(math.Log10(float64(lineCount) + 1))
+	return int(math.Log10(float64(len(content)) + 1))
 }
 
 func printLine(rowOffset int, lineNumber, lineNumberWidth int, line string) {
+	screenRow := lineNumber - rowOffset
 	// Move cursor according to the offset
-	terminal.MoveCursor(lineNumber-rowOffset, 0)
+	terminal.MoveCursor(screenRow, 0)
 
 	terminal.SetTextColor(themes.White)
 	fmt.Printf("%*d  ", lineNumberWidth, lineNumber+1)
 	terminal.ResetTextColor()
 
-	fmt.Println(line)
+	fmt.Print(line)
+	fmt.Print("\r\n")
 }
 
 func renderStatusBar(e *editor.Editor, terminalWidth int) {
