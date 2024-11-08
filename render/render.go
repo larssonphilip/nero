@@ -86,7 +86,7 @@ func renderStatusBar(e *editor.Editor, terminalWidth int) {
 
 	leftStatus := fmt.Sprintf("%s %s - %d lines %s", fileName, modifiedFlag, totalLines, themes.Gray)
 	rightStatus := fmt.Sprintf("%d:%d", lineNumber, columnNumber)
-
+	rightStatus = fmt.Sprintf("RowOffset: %d", e.RowOffset)
 	padding := terminalWidth - len(leftStatus) - len(rightStatus)
 	if padding < 0 {
 		padding = 0
