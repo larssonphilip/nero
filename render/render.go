@@ -3,6 +3,7 @@ package render
 import (
 	"fmt"
 	"math"
+	"time"
 
 	"nero.app/nero/editor"
 	"nero.app/nero/terminal"
@@ -36,13 +37,14 @@ func RenderScreen(e *editor.Editor) {
 			line := content[fileLineIndex]
 			printLine(e.RowOffset, fileLineIndex, lineNumberWidth, line)
 		} else {
-			fmt.Println("~")
+			fmt.Println(" ~")
+			// fmt.Printf("%*s~\n", lineNumberWidth+1, "")
 		}
 	}
 
 	renderStatusBar(e, terminalWidth)
 
-	cursorX := e.CursorX - lineNumberWidth + 2 - e.ColOffset
+	cursorX := e.CursorX - e.ColOffset + lineNumberWidth + 2
 	cursorY := e.CursorY - e.RowOffset
 
 	if cursorY >= 0 && cursorY < e.ContentHeight {
@@ -51,7 +53,7 @@ func RenderScreen(e *editor.Editor) {
 }
 
 func calculateLineNumberWidth(content []string) int {
-	return int(math.Log10(float64(len(content)) + 1))
+	return int(math.Log10(float64(len(content))) + 1)
 }
 
 func printLine(rowOffset int, lineNumber, lineNumberWidth int, line string) {
@@ -84,9 +86,11 @@ func renderStatusBar(e *editor.Editor, terminalWidth int) {
 	columnNumber := e.CursorX + 1
 	totalLines := len(e.GetEditorContent())
 
-	leftStatus := fmt.Sprintf("%s %s - %d lines %s", fileName, modifiedFlag, totalLines, themes.Gray)
-	rightStatus := fmt.Sprintf("%d:%d", lineNumber, columnNumber)
-	rightStatus = fmt.Sprintf("RowOffset: %d", e.RowOffset)
+	leftStatus := fmt.Sprintf("%s %s - %d lines", fileName, modifiedFlag, totalLines)
+
+	percentOfPage := int(float64(lineNumber) / float64(totalLines) * 100)
+	currentTime := time.Now()
+	rightStatus := fmt.Sprintf("%d%% %d:%d %v", percentOfPage, lineNumber, columnNumber, currentTime.Format("15:04"))
 	padding := terminalWidth - len(leftStatus) - len(rightStatus)
 	if padding < 0 {
 		padding = 0
