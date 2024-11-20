@@ -1,6 +1,7 @@
 package terminal
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 
@@ -39,35 +40,37 @@ func ReadInput() (byte, error) {
 }
 
 func ReadKey() (string, error) {
-	b := make([]byte, 1)
-	_, err := os.Stdin.Read(b)
+	reader := bufio.NewReader(os.Stdin)
+	b, err := reader.ReadByte()
 	if err != nil {
 		return "", err
 	}
 
-	switch b[0] {
+	switch b {
 	case 27:
-		sequence := make([]byte, 2)
-		os.Stdin.Read(sequence)
-
-		// Double press ESC to exit
-		if len(sequence) > 1 && sequence[1] == 0 {
+		sequence, err := reader.Peek(2)
+		if err != nil {
 			return KeyEsc, nil
 		}
 
-		// Interpret the escape sequence as an arrow key
-		switch string(sequence) {
-		case "[A":
-			return KeyUp, nil
-		case "[B":
-			return KeyDown, nil
-		case "[C":
-			return KeyRight, nil
-		case "[D":
-			return KeyLeft, nil
-		default:
-			return "UNKNOWN", nil
+		if sequence[0] == '[' {
+			reader.Discard(2)
+
+			switch sequence[1] {
+			case 'A':
+				return KeyUp, nil
+			case 'B':
+				return KeyDown, nil
+			case 'C':
+				return KeyRight, nil
+			case 'D':
+				return KeyLeft, nil
+			default:
+				return "UNKNOWN", nil
+			}
 		}
+
+		return KeyEsc, nil
 	case 127:
 		return KeyBackspace, nil
 	case 13:
@@ -75,7 +78,7 @@ func ReadKey() (string, error) {
 	case 9:
 		return KeyTab, nil
 	default:
-		if b[0] > 31 && b[0] < 127 {
+		if b > 31 && b < 127 {
 			return string(b), nil
 		}
 		return "UNKNOWN", nil

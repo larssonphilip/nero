@@ -10,4 +10,5 @@ const (
 	KeyBackspace = "BACKSPACE"
 	KeyEnter     = "ENTER"
 	KeyTab       = "TAB"
+	KeyMouse     = "MOUSE"
 )
