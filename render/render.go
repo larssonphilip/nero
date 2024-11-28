@@ -69,6 +69,20 @@ func printLine(rowOffset int, lineNumber, lineNumberWidth int, line string) {
 	fmt.Print("\r\n")
 }
 
+func renderSavePrompt(e *editor.Editor) {
+	terminal.ClearScreen()
+	terminal.HideCursor()
+	defer terminal.ShowCursor()
+	terminalWidth, terminalHeight, err := terminal.GetWindowSize()
+	if err != nil {
+		fmt.Printf("Error while getting window size: %v\n", err)
+	}
+	e.ContentHeight = terminalHeight - 1
+	e.ContentWidth = terminalWidth
+	terminal.MoveCursor(0, 0)
+	fmt.Println("Save changes to file? (y/n)")
+}
+
 func renderStatusBar(e *editor.Editor, terminalWidth int) {
 	fmt.Print("\x1b[7m")
 
